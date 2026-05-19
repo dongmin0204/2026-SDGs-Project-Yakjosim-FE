@@ -1,6 +1,6 @@
 # AI Collaboration Guide
 
-이 문서는 대학생 개발자가 ChatGPT, Claude, Codex 같은 AI를 활용해 이 프로젝트를 개선할 때 품질이 무너지지 않도록 돕기 위한 작업 가이드다.
+이 문서는 개발자가 ChatGPT, Claude, Codex 같은 AI를 활용해 이 프로젝트를 개선할 때 품질이 무너지지 않도록 돕기 위한 작업 가이드다.
 
 ## 기본 원칙
 
