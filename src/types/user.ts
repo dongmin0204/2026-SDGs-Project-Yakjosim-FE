@@ -1,8 +1,9 @@
-import type { Medicine, AnalysisSession } from './index';
+import type { Medicine, AnalysisSession, SupplementIngredient } from './index';
 
 export type Sex = 'male' | 'female' | 'other';
 
 export interface UserProfile {
+  birthDate?: string;
   birthYear?: number;
   sex?: Sex;
   isPregnant: boolean;
@@ -13,6 +14,12 @@ export interface UserProfile {
 export interface SavedMedicine {
   id: string;
   medicine: Medicine;
+  addedAt: Date;
+}
+
+export interface SavedSupplement {
+  id: string;
+  supplement: SupplementIngredient;
   addedAt: Date;
 }
 

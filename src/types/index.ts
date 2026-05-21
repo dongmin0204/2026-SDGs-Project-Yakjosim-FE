@@ -20,5 +20,6 @@ export type {
   Sex,
   UserProfile,
   SavedMedicine,
+  SavedSupplement,
   SavedSession,
 } from './user';
