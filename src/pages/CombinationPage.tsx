@@ -184,7 +184,7 @@ export default function CombinationPage() {
             variant="outline"
             size="sm"
             className="mt-3"
-            onClick={() => navigate('/search?mode=add')}
+            onClick={() => navigate('/add-medicine')}
           >
             <Plus className="mr-1 h-4 w-4" />
             약 추가

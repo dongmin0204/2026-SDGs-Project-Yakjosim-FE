@@ -7,6 +7,7 @@ import { UserProvider, useUserContext } from '@/contexts/UserContext';
 import OnboardingPage from '@/pages/OnboardingPage';
 import HomePage from '@/pages/HomePage';
 import SearchPage from '@/pages/SearchPage';
+import AddMedicinePage from '@/pages/AddMedicinePage';
 import OcrPage from '@/pages/OcrPage';
 import CombinationPage from '@/pages/CombinationPage';
 import ResultsPage from '@/pages/ResultsPage';
@@ -43,6 +44,7 @@ function AppRoutes() {
       <Route path="/" element={<OnboardingGuard />} />
       <Route path="/home" element={<HomePage />} />
       <Route path="/search" element={<SearchPage />} />
+      <Route path="/add-medicine" element={<AddMedicinePage />} />
       <Route path="/ocr" element={<OcrPage />} />
       <Route path="/combine" element={<CombinationPage />} />
       <Route path="/results" element={<ResultsPage />} />

@@ -1,5 +1,6 @@
-import { AlertTriangle, AlertCircle, Clock, Info, HelpCircle } from 'lucide-react';
+import { AlertTriangle, AlertCircle, HelpCircle } from 'lucide-react';
 import type { Severity } from '@/types';
+import { getRiskDisplaySeverity } from '@/utils/risk';
 
 interface RiskBadgeProps {
   severity: Severity;
@@ -7,7 +8,7 @@ interface RiskBadgeProps {
 }
 
 const config: Record<
-  Severity,
+  ReturnType<typeof getRiskDisplaySeverity>,
   { color: string; icon: React.ElementType; label: string }
 > = {
   critical: {
@@ -15,20 +16,10 @@ const config: Record<
     icon: AlertTriangle,
     label: '금기',
   },
-  high: {
+  caution: {
     color: 'bg-orange-100 text-orange-700 border-orange-300',
     icon: AlertCircle,
-    label: '고위험 주의',
-  },
-  medium: {
-    color: 'bg-yellow-100 text-yellow-700 border-yellow-300',
-    icon: Clock,
-    label: '시간 간격 필요',
-  },
-  low: {
-    color: 'bg-blue-100 text-blue-700 border-blue-300',
-    icon: Info,
-    label: '낮은 주의',
+    label: '주의',
   },
   unknown: {
     color: 'bg-gray-100 text-gray-500 border-gray-300',
@@ -38,11 +29,13 @@ const config: Record<
 };
 
 export function RiskBadge({ severity, className = '' }: RiskBadgeProps) {
-  const { color, icon: Icon, label } = config[severity];
+  const displaySeverity = getRiskDisplaySeverity(severity);
+  const { color, icon: Icon, label } = config[displaySeverity];
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${color} ${className}`}
+      data-slot="risk-badge"
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ${color} ${className}`}
     >
       <Icon className="h-3.5 w-3.5" />
       {label}

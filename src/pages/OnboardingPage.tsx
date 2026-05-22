@@ -55,6 +55,8 @@ const sexLabelMap: Record<Sex, string> = {
   other: '기타',
 };
 
+const ONBOARDING_REDIRECT_KEY = 'yak-josim-onboarding-redirect';
+
 function getAgeFromBirthDate(birthDate: string): number | null {
   if (!birthDate) {
     return null;
@@ -127,23 +129,26 @@ export default function OnboardingPage() {
     const age = getAgeFromBirthDate(birthDate);
     const isElderly = age !== null && age >= 65;
 
-    navigate(path, { replace: true });
+    try {
+      window.sessionStorage.setItem(ONBOARDING_REDIRECT_KEY, path);
+    } catch {
+      // sessionStorage can be unavailable in some browser privacy modes.
+    }
 
-    window.setTimeout(() => {
-      dispatch({
-        type: 'SET_PROFILE',
-        payload: {
-          birthDate,
-          birthYear: new Date(birthDate).getFullYear(),
-          sex: sex || undefined,
-          isPregnant,
-          isElderly,
-          chronicConditions,
-        },
-      });
-      dispatch({ type: 'SET_SENIOR_MODE', payload: isElderly });
-      dispatch({ type: 'COMPLETE_ONBOARDING' });
-    }, 0);
+    dispatch({
+      type: 'SET_PROFILE',
+      payload: {
+        birthDate,
+        birthYear: new Date(birthDate).getFullYear(),
+        sex: sex || undefined,
+        isPregnant,
+        isElderly,
+        chronicConditions,
+      },
+    });
+    dispatch({ type: 'SET_SENIOR_MODE', payload: isElderly });
+    dispatch({ type: 'COMPLETE_ONBOARDING' });
+    navigate(path, { replace: true });
   };
 
   const handleRequestStart = (path: '/home' | '/combine') => {

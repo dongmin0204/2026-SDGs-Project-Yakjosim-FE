@@ -22,9 +22,7 @@ import type { Severity } from '@/types';
 
 const riskLevels: { severity: Severity; description: string }[] = [
   { severity: 'critical', description: '절대 함께 복용하면 안 되는 조합입니다.' },
-  { severity: 'high', description: '심각한 부작용이 발생할 수 있습니다.' },
-  { severity: 'medium', description: '복용 시간 간격을 두어야 합니다.' },
-  { severity: 'low', description: '경미한 영향이 있을 수 있습니다.' },
+  { severity: 'high', description: '시간 간격 조정이나 전문가 상담이 필요한 주의 조합입니다.' },
   { severity: 'unknown', description: '상호작용 정보가 확인되지 않았습니다. 안전함을 의미하지 않습니다.' },
 ];
 
@@ -48,7 +46,7 @@ export default function SettingsPage() {
                 고령층 모드
               </Label>
               <p className="text-xs text-gray-400">
-                글꼴 크기를 키워 읽기 쉽게 합니다
+                글꼴과 터치 영역을 키워 앱 전체를 읽기 쉽게 합니다
               </p>
             </div>
             <Switch
@@ -80,15 +78,6 @@ export default function SettingsPage() {
             <p className="font-medium">약 조심 v1.0</p>
             <p>본 서비스는 의료 진단을 대체하지 않습니다.</p>
             <p>데이터 출처: 약학정보원, 식품의약품안전처 DUR</p>
-            <p>
-              문의:{' '}
-              <a
-                href="mailto:nm2200521@gmail.com"
-                className="text-blue-600 underline"
-              >
-                nm2200521@gmail.com
-              </a>
-            </p>
           </div>
         </SectionCard>
 

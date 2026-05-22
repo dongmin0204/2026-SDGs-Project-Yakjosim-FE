@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from 'react-router';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Info } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
-import { Alert, AlertDescription } from '@/app/components/ui/alert';
 import {
   Accordion,
   AccordionItem,
@@ -11,8 +10,8 @@ import {
 import { PageContainer } from '@/components/layout/PageContainer';
 import { DisclaimerBanner } from '@/components/common/DisclaimerBanner';
 import { RiskBadge } from '@/components/common/RiskBadge';
-import { SectionCard } from '@/components/common/SectionCard';
 import { useAnalysisContext } from '@/contexts/AnalysisContext';
+import { getRiskDisplaySeverity, getRiskSupportTags } from '@/utils/risk';
 
 const interactionTypeLabels: Record<string, string> = {
   contraindication: '병용금기',
@@ -45,7 +44,7 @@ export default function DetailPage() {
   }
 
   const rule = result.rule;
-  const needsConsultation = result.severity === 'critical' || result.severity === 'high';
+  const supportTags = getRiskSupportTags(result);
 
   return (
     <PageContainer title="상세 정보" showBackButton showBottomNav={false}>
@@ -57,40 +56,41 @@ export default function DetailPage() {
           <p className="text-xl font-bold text-gray-900">
             {rule.subjectName} + {rule.objectName}
           </p>
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mt-3">
             <RiskBadge severity={result.severity} className="text-sm px-3 py-1" />
-            <span className="text-sm text-gray-500">
-              {interactionTypeLabels[rule.interactionType] ?? rule.interactionType}
-            </span>
           </div>
         </div>
 
-        {/* Mechanism */}
-        <SectionCard title="왜 위험한가요?">
-          <p className="text-sm leading-relaxed text-gray-700">{result.explanation}</p>
-        </SectionCard>
-
-        {/* Recommendation */}
-        <SectionCard title="어떻게 해야 하나요?">
-          <p className="text-sm leading-relaxed text-gray-700">
-            {result.recommendation}
-          </p>
-          {rule.minIntervalHours && (
-            <div className="mt-3 rounded-lg bg-yellow-50 border border-yellow-200 p-3">
-              <p className="text-sm font-medium text-yellow-800">
-                최소 {rule.minIntervalHours}시간 간격을 두세요
-              </p>
+        {/* Mechanism + Recommendation combined */}
+        <div className="overflow-hidden rounded-xl border bg-white">
+          <div className="p-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">위험 이유</p>
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
+              <p className="text-sm leading-relaxed text-gray-800">{result.explanation}</p>
+            </div>
+          </div>
+          {(supportTags.length > 0 || rule.minIntervalHours) && (
+            <div className="border-t px-4 py-4">
+              <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-gray-400">권고 사항</p>
+              <div className="space-y-2">
+                {supportTags.map((tag) => (
+                  <div key={tag} className="flex items-center gap-2.5">
+                    <Info className="h-4 w-4 shrink-0 text-blue-500" />
+                    <p className="text-sm leading-relaxed text-gray-800">{tag}</p>
+                  </div>
+                ))}
+              </div>
+              {rule.minIntervalHours && (
+                <div className="mt-3 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
+                  <p className="text-sm font-medium text-yellow-800">
+                    최소 {rule.minIntervalHours}시간 간격을 두세요
+                  </p>
+                </div>
+              )}
             </div>
           )}
-          {needsConsultation && (
-            <Alert className="mt-3 border-red-200 bg-red-50">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-sm font-medium text-red-700">
-                반드시 의사·약사와 상담하세요
-              </AlertDescription>
-            </Alert>
-          )}
-        </SectionCard>
+        </div>
 
         {/* Evidence accordion */}
         <Accordion type="single" collapsible className="rounded-xl border bg-white">
@@ -134,7 +134,7 @@ export default function DetailPage() {
                 <p className="mt-2 text-xs text-gray-400">
                   이 정보는 공공 데이터를 기반으로 합니다.
                 </p>
-                {result.severity === 'unknown' && (
+                {getRiskDisplaySeverity(result.severity) === 'unknown' && (
                   <p className="text-xs font-medium text-amber-600">
                     "확인 정보 없음"은 "안전함"을 의미하지 않습니다.
                   </p>

@@ -1,5 +1,6 @@
 import type { AnalysisItem, AnalysisResult, AnalysisSession, Severity } from '@/types';
 import { interactionRules } from '@/mock';
+import { getRiskDisplayLabel, getRiskDisplaySeverity } from '@/utils/risk';
 
 const ANALYSIS_DELAY_MS = 500;
 
@@ -18,7 +19,9 @@ const severityOrder: Record<Severity, number> = {
 function getHighestSeverity(results: AnalysisResult[]): Severity {
   if (results.length === 0) return 'unknown';
   return results.reduce<Severity>((highest, r) => {
-    return severityOrder[r.severity] > severityOrder[highest] ? r.severity : highest;
+    const current = getRiskDisplaySeverity(r.severity) === 'caution' ? 'high' : r.severity;
+    const previous = getRiskDisplaySeverity(highest) === 'caution' ? 'high' : highest;
+    return severityOrder[current] > severityOrder[previous] ? r.severity : highest;
   }, 'unknown');
 }
 
@@ -48,7 +51,7 @@ export async function analyzeInteractions(
             id: `result-${resultIndex}`,
             rule,
             severity: rule.severity,
-            summary: `${rule.subjectName} + ${rule.objectName}: ${getSeverityLabel(rule.severity)}`,
+            summary: `${rule.subjectName} + ${rule.objectName}: ${getRiskDisplayLabel(rule.severity)}`,
             explanation: rule.mechanism,
             recommendation: rule.recommendation,
           });
@@ -75,15 +78,4 @@ export async function getSessionResults(
   await delay(200);
   void sessionId;
   return null;
-}
-
-function getSeverityLabel(severity: Severity): string {
-  const labels: Record<Severity, string> = {
-    critical: '병용금기',
-    high: '고위험 주의',
-    medium: '시간 간격 필요',
-    low: '낮은 주의',
-    unknown: '정보 없음',
-  };
-  return labels[severity];
 }
