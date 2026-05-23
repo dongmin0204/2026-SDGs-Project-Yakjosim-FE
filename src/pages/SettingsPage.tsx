@@ -55,9 +55,6 @@ export default function SettingsPage() {
               onCheckedChange={() => dispatch({ type: 'TOGGLE_SENIOR_MODE' })}
             />
           </div>
-          <p className="mt-2 text-xs text-gray-500">
-            고령층 모드: {state.seniorMode ? 'ON' : 'OFF'}
-          </p>
         </SectionCard>
 
         {/* Risk legend */}
