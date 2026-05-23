@@ -54,229 +54,140 @@ src/services/
 
 ---
 
-## API 연동 가이드
+## API 연동 — 교체 지점 안내
 
-### 1. 사용자 프로필 저장 (온보딩)
+> **중요:** 아래에 나오는 TypeScript 타입은 현재 mock 데이터 기준의 **프론트엔드 내부 구조**다.  
+> 백엔드 API 스펙이 확정되지 않았으므로, 실제 API 응답 구조는 백엔드와 별도로 협의해야 한다.  
+> API 스펙이 정해지면 각 서비스 파일 내부에서 응답을 프론트 타입으로 변환(매핑)하면 된다. **페이지 코드는 건드리지 않아도 된다.**
 
-**파일:** `src/contexts/UserContext.tsx`  
-**현재 동작:** localStorage(`yak-josim-user-state`)에만 저장, 백엔드 전송 없음.
+---
 
-온보딩 완료 시 `dispatch({ type: 'SET_PROFILE', payload })` 호출.  
-이 시점에 백엔드로 프로필을 전송하거나 세션을 생성하면 된다.
+### 1. 사용자 프로필 (온보딩)
 
-**전송할 데이터:**
+**교체 위치:** `src/contexts/UserContext.tsx`  
+**현재 동작:** localStorage에만 저장, 백엔드 전송 없음.
 
-```ts
-interface UserProfile {
-  birthDate?: string;       // 'YYYY-MM-DD'
-  birthYear?: number;
-  sex?: 'male' | 'female' | 'other';
-  isPregnant: boolean;
-  isElderly: boolean;       // birthDate 기준 65세 이상이면 자동 true
-  chronicConditions: string[]; // ['고혈압', '당뇨'] 등, '없음' 포함 가능
-}
-```
+온보딩 완료 시점(`dispatch({ type: 'COMPLETE_ONBOARDING' })` 호출 직후)에 백엔드 전송 로직을 추가하면 된다.
 
-**주의:** 현재 `chronicConditions`, `isPregnant` 등 프로필 정보가 분석 API에 전달되지 않는다. 개인화 분석을 하려면 `analyzeInteractions()` 호출 시 프로필도 함께 넘겨야 한다.
+**프론트가 수집하는 데이터 (mock 기준):**
+- 생년월일 (`birthDate: string`, 형식: `'YYYY-MM-DD'`)
+- 성별 (`sex: 'male' | 'female' | 'other'`)
+- 임신 여부 (`isPregnant: boolean`)
+- 주요 만성질환 (`chronicConditions: string[]`, 예: `['고혈압', '당뇨']`)
+- 65세 이상 여부 (`isElderly: boolean`, 생년월일에서 자동 계산)
+
+**추후 논의 필요:** 현재 프로필 정보(만성질환, 임신 여부 등)가 상호작용 분석 호출 시 전달되지 않는다. 개인화 분석이 필요하다면 분석 API 호출 시 프로필을 함께 넘기는 방식을 백엔드와 협의해야 한다.
 
 ---
 
 ### 2. 약 검색
 
-**파일:** `src/services/medicineService.ts`  
-**교체할 함수 3개:**
+**교체 위치:** `src/services/medicineService.ts`
 
 ```ts
-// 약품명 · 제조사 · 성분명 검색
+// 이 함수들의 내부 구현을 실제 API 호출로 교체한다
 async function searchMedicines(query: string): Promise<Medicine[]>
-
-// ID로 단일 약 조회
 async function getMedicineById(id: string): Promise<Medicine | null>
-
-// 전체 성분 목록 (드롭다운 등에 활용)
 async function getIngredients(): Promise<ActiveIngredient[]>
 ```
 
-**반환 타입:**
+**화면에서 사용하는 약 정보 필드 (mock 기준):**
+- `id`, `productName` (약품명), `manufacturer` (제조사)
+- `dosageForm` (제형, 예: '정제'), `classification` (구분, 예: '전문의약품')
+- `indication` (주요 용도, optional)
+- `ingredients` — 성분 목록, 각 성분에 `nameKo`, `amount`, `unit`, `isMain` 사용
 
-```ts
-interface Medicine {
-  id: string;
-  productName: string;
-  manufacturer: string;
-  dosageForm: string;        // '정제', '캡슐' 등
-  classification: string;   // '전문의약품', '일반의약품' 등
-  ingredients: MedicineIngredient[];
-  indication?: string;       // 주요 용도 (optional)
-}
-
-interface MedicineIngredient {
-  ingredient: ActiveIngredient;
-  amount: number;
-  unit: string;              // 'mg', 'mcg' 등
-  isMain: boolean;
-}
-
-interface ActiveIngredient {
-  id: string;
-  nameKo: string;
-  nameEn: string;
-  category: string;
-}
-```
-
-**연동 대상 API 후보:** 식품의약품안전처 DUR, e약은요, 약학정보원
+실제 API 응답 구조가 다를 경우 이 파일 안에서 변환 처리하면 된다.  
+**연동 대상 후보:** 식품의약품안전처 DUR, e약은요, 약학정보원
 
 ---
 
 ### 3. OCR (처방전 촬영)
 
-**파일:** `src/services/ocrService.ts`  
-**교체할 함수:**
+**교체 위치:** `src/services/ocrService.ts`
 
 ```ts
 async function uploadPrescription(file: File): Promise<OcrResult[]>
-
-interface OcrResult {
-  medicine: Medicine;   // 인식된 약 정보 (위 Medicine 타입)
-  confidence: number;   // 0.0 ~ 1.0
-}
+// OcrResult: { medicine: Medicine, confidence: number }
 ```
 
-현재는 무조건 고정된 3개 약을 반환한다. 실제 구현 시 이미지를 서버에 업로드하거나 외부 OCR API(Google Vision, Azure, Naver Clova 등)를 사용하면 된다.
+현재는 항상 고정된 3개 약을 반환한다. 실제 구현 시 이미지를 서버로 전송하거나 외부 OCR API를 연동하면 된다.
 
-OCR 결과는 `SearchPage`로 `navigate('/search', { state: { recognizedMedicines } })`로 전달된다. 타입만 맞으면 UI는 그대로 동작한다.
+OCR 결과는 `navigate('/search', { state: { recognizedMedicines } })`로 SearchPage에 전달된다. 반환값이 위 타입을 맞추면 UI는 그대로 동작한다.
 
 ---
 
 ### 4. 음식 목록
 
-**파일:** `src/mock/foods.ts` → **서비스 레이어 신규 작성 필요**  
-현재 `CombinationPage`에서 직접 import:
+**교체 위치:** `src/mock/foods.ts` (현재 `CombinationPage`에서 직접 import)  
+**서비스 레이어 없음 → 신규 작성 필요**
 
 ```ts
-import { foods } from '@/mock/foods';
+// 신규 생성: src/services/foodService.ts
+async function getFoods(): Promise<FoodItem[]>
+async function searchFoods(query: string): Promise<FoodItem[]>
 ```
 
-API 연동 시:
-1. `src/services/foodService.ts` 신규 생성
-2. `CombinationPage`에서 `useEffect`로 목록 fetch
-3. 또는 검색 기반으로 전환
+`CombinationPage`에서 `import { foods } from '@/mock/foods'` 부분을 서비스 호출로 교체해야 한다.
 
-**타입:**
-
-```ts
-interface FoodItem {
-  id: string;
-  name: string;
-  group: string;          // '자몽류', '유제품' 등 카테고리
-  aliases: string[];      // 검색용 별칭 ('자몽주스', '그레이프프루트' 등)
-}
-```
+**화면에서 사용하는 필드 (mock 기준):**
+- `id`, `name` (음식명), `group` (카테고리), `aliases` (검색용 별칭)
 
 ---
 
 ### 5. 영양제 목록
 
-**파일:** `src/mock/supplements.ts` → **서비스 레이어 신규 작성 필요**  
-음식과 동일한 구조. 현재 `CombinationPage`에서 직접 import.
+**교체 위치:** `src/mock/supplements.ts` (현재 `CombinationPage`에서 직접 import)  
+**서비스 레이어 없음 → 신규 작성 필요**
 
-**타입:**
+음식과 동일한 구조. `import { supplements } from '@/mock/supplements'` 부분을 서비스 호출로 교체.
 
-```ts
-interface SupplementIngredient {
-  id: string;
-  nameKo: string;
-  nameEn: string;
-  category: string;       // '미네랄', '비타민' 등
-  aliases: string[];
-}
-```
+**화면에서 사용하는 필드 (mock 기준):**
+- `id`, `nameKo`, `nameEn`, `category`, `aliases`
 
 ---
 
 ### 6. 상호작용 분석 (핵심)
 
-**파일:** `src/services/analysisService.ts`  
-**교체할 함수:**
+**교체 위치:** `src/services/analysisService.ts`
 
 ```ts
 async function analyzeInteractions(items: AnalysisItem[]): Promise<AnalysisSession>
 ```
 
-**요청 데이터:**
+**프론트가 API에 넘기는 입력 (mock 기준):**
+- 선택된 항목 배열: 각각 `{ type: 'drug'|'food'|'supplement', originalId: string, name: string }`
 
-```ts
-interface AnalysisItem {
-  id: string;         // 화면 내 고유 ID
-  type: 'drug' | 'food' | 'supplement';
-  name: string;
-  originalId: string; // 약/음식/영양제 DB의 원본 ID
-}
-```
+**프론트가 API로부터 받아서 화면에 표시하는 데이터 (mock 기준):**
+- 결과 목록 (`results`): 각 조합 쌍에 대해
+  - `severity`: `'critical'|'high'|'medium'|'low'|'unknown'` — 위험도
+  - `explanation`: 위험 이유 설명 (상세 화면에 표시)
+  - `recommendation`: 권고 사항
+  - `rule.subjectName` + `rule.objectName`: 조합 쌍 이름 (예: "와파린 + 아스피린")
+  - `rule.interactionType`: 상호작용 유형
+  - `rule.minIntervalHours`: 복용 간격 권고 (있을 경우)
+  - `rule.evidenceSource`, `rule.evidenceUrl`: 근거 출처
 
-**응답 데이터:**
-
-```ts
-interface AnalysisSession {
-  id: string;
-  items: AnalysisItem[];
-  results: AnalysisResult[];
-  overallSeverity: Severity;  // 결과 중 가장 높은 위험도
-  createdAt: Date;
-}
-
-interface AnalysisResult {
-  id: string;
-  rule: InteractionRule;
-  severity: Severity;         // 'critical' | 'high' | 'medium' | 'low' | 'unknown'
-  summary: string;
-  explanation: string;        // 위험 이유 (상세 화면에 표시)
-  recommendation: string;     // 권고 사항
-}
-
-interface InteractionRule {
-  id: string;
-  subjectType: 'drug' | 'food' | 'supplement';
-  subjectId: string;
-  subjectName: string;
-  objectType: 'drug' | 'food' | 'supplement';
-  objectId: string;
-  objectName: string;
-  interactionType: 'contraindication' | 'caution' | 'absorption_decrease'
-                 | 'effect_increase' | 'effect_decrease' | 'duplicate';
-  severity: Severity;
-  mechanism: string;          // 상호작용 메커니즘 설명
-  recommendation: string;
-  minIntervalHours?: number;  // 복용 간격 권고 (있을 경우)
-  evidenceSource: string;     // 출처 (예: '식품의약품안전처 DUR')
-  evidenceUrl?: string;
-}
-```
-
-**위험도 표시 매핑** (`src/utils/risk.ts`에 정의):
+**위험도 화면 표시 매핑** (`src/utils/risk.ts`):
 
 | severity | 화면 표시 | 배지 색상 |
 |----------|-----------|-----------|
 | `critical` | 금기 | 빨강 |
-| `high` | 주의 | 주황 |
-| `medium` | 주의 | 주황 (`high`와 동일하게 표시) |
-| `low` | 주의 | 주황 |
+| `high` / `medium` / `low` | 주의 | 주황 |
 | `unknown` | 정보 없음 | 회색 |
 
 ---
 
-### 7. 분석 세션 조회
+### 7. 분석 세션 저장 · 조회
 
-**파일:** `src/services/analysisService.ts`  
-현재 `getSessionResults()`는 항상 `null` 반환.  
-분석 결과는 React Context(`AnalysisContext`)에만 저장되므로, 새로고침하면 사라진다.
-
-백엔드 세션 저장이 추가되면 이 함수를 교체해서 `/share/:sessionId` 등에서 서버에서 결과를 가져올 수 있다.
+**교체 위치:** `src/services/analysisService.ts`
 
 ```ts
 async function getSessionResults(sessionId: string): Promise<AnalysisSession | null>
 ```
+
+현재 항상 `null` 반환. 분석 결과가 React Context에만 있어서 새로고침 시 사라진다.  
+백엔드 세션 저장이 추가되면 `/share/:sessionId` 화면에서 서버에서 결과를 가져올 수 있다.
 
 ---
 
