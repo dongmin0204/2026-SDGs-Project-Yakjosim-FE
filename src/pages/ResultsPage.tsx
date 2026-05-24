@@ -31,6 +31,7 @@ const tabFilters: {
   { value: 'all', label: '전체', severities: null },
   { value: 'critical', label: '금기', severities: ['critical'] },
   { value: 'caution', label: '주의', severities: ['caution'] },
+  { value: 'unknown', label: '확인 정보 없음', severities: ['unknown'] },
 ];
 
 function countBySeverity(results: AnalysisResult[], severity: RiskDisplaySeverity): number {
