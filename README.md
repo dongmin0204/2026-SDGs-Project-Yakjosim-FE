@@ -135,4 +135,4 @@ docs/
 - 현재 `package.json`에는 `dev`, `build`, `lint`, `lint:fix`가 정의되어 있습니다.
 - `test`, `preview` 스크립트는 아직 없습니다.
 - 이 앱은 의료 안전 정보를 다루므로, 시각적 화려함보다 명확한 정보 전달과 접근성이 우선입니다.
-- 현재 개발 기준 문서는 [`docs/specs/functional-spec-v2.md`](/Users/eun/dev/GDGoC/demo_day/docs/specs/functional-spec-v2.md:1)입니다.
+- 현재 개발 기준 문서는 [`docs/specs/functional-spec-v2.md`](./docs/specs/functional-spec-v2.md)입니다.
