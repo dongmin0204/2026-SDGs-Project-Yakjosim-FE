@@ -11,7 +11,10 @@ export function AppHeader({ title = '약 조심', showBackButton = false }: AppH
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-50 flex h-14 items-center border-b border-gray-200 bg-white px-4">
+    <header
+      data-slot="app-header"
+      className="sticky top-0 z-50 flex h-14 items-center border-b border-gray-200 bg-white px-4"
+    >
       {showBackButton ? (
         <Button
           variant="ghost"

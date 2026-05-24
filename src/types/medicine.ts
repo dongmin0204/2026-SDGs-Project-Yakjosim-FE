@@ -19,6 +19,7 @@ export interface Medicine {
   dosageForm: string;
   classification: string;
   ingredients: MedicineIngredient[];
+  indication?: string;
 }
 
 export interface FoodItem {
