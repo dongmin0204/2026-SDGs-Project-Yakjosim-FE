@@ -1,6 +1,6 @@
-import { AlertTriangle, AlertCircle, HelpCircle } from 'lucide-react';
+import { AlertTriangle, AlertCircle, HelpCircle, CheckCircle, Info, Stethoscope } from 'lucide-react';
 import type { Severity } from '@/types';
-import { getRiskDisplaySeverity } from '@/utils/risk';
+import { getRiskDisplaySeverity, type RiskDisplaySeverity } from '@/utils/risk';
 
 interface RiskBadgeProps {
   severity: Severity;
@@ -8,36 +8,59 @@ interface RiskBadgeProps {
 }
 
 const config: Record<
-  ReturnType<typeof getRiskDisplaySeverity>,
-  { color: string; icon: React.ElementType; label: string }
+  RiskDisplaySeverity,
+  { color: string; icon: React.ElementType; label: string; ariaPrefix: string }
 > = {
   critical: {
-    color: 'bg-red-100 text-red-700 border-red-300',
+    color: 'bg-badge-critical-bg text-badge-critical-fg border-badge-critical-border',
     icon: AlertTriangle,
     label: '금기',
+    ariaPrefix: '위험',
   },
   caution: {
-    color: 'bg-orange-100 text-orange-700 border-orange-300',
+    color: 'bg-badge-warning-bg text-badge-warning-fg border-badge-warning-border',
     icon: AlertCircle,
     label: '주의',
+    ariaPrefix: '주의',
+  },
+  safe: {
+    color: 'bg-badge-safe-bg text-badge-safe-fg border-badge-safe-border',
+    icon: CheckCircle,
+    label: '안전',
+    ariaPrefix: '안전',
+  },
+  info: {
+    color: 'bg-badge-info-bg text-badge-info-fg border-badge-info-border',
+    icon: Info,
+    label: '참고',
+    ariaPrefix: '정보',
+  },
+  consult: {
+    color: 'bg-badge-consult-bg text-badge-consult-fg border-badge-consult-border',
+    icon: Stethoscope,
+    label: '상담 권장',
+    ariaPrefix: '상담 필요',
   },
   unknown: {
-    color: 'bg-gray-100 text-gray-500 border-gray-300',
+    color: 'bg-badge-unknown-bg text-badge-unknown-fg border-badge-unknown-border',
     icon: HelpCircle,
     label: '확인 정보 없음',
+    ariaPrefix: '미확인',
   },
 };
 
 export function RiskBadge({ severity, className = '' }: RiskBadgeProps) {
   const displaySeverity = getRiskDisplaySeverity(severity);
-  const { color, icon: Icon, label } = config[displaySeverity];
+  const { color, icon: Icon, label, ariaPrefix } = config[displaySeverity];
 
   return (
     <span
+      role="status"
+      aria-label={`${ariaPrefix}: ${label}`}
       data-slot="risk-badge"
       className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap ${color} ${className}`}
     >
-      <Icon className="h-3.5 w-3.5" />
+      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
       {label}
     </span>
   );

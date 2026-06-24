@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { Toaster } from 'sonner';
+import { OverlayProvider } from 'overlay-kit';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { MedicineProvider } from '@/contexts/MedicineContext';
 import { AnalysisProvider } from '@/contexts/AnalysisContext';
@@ -59,12 +60,13 @@ function AppRoutes() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        <UserProvider>
-          <MedicineProvider>
-            <AnalysisProvider>
-              <AppRoutes />
-              <Toaster
+      <OverlayProvider>
+        <BrowserRouter>
+          <UserProvider>
+            <MedicineProvider>
+              <AnalysisProvider>
+                <AppRoutes />
+                <Toaster
                 position="top-center"
                 richColors
                 toastOptions={{
@@ -76,10 +78,11 @@ export default function App() {
                   },
                 }}
               />
-            </AnalysisProvider>
-          </MedicineProvider>
-        </UserProvider>
-      </BrowserRouter>
+              </AnalysisProvider>
+            </MedicineProvider>
+          </UserProvider>
+        </BrowserRouter>
+      </OverlayProvider>
     </ErrorBoundary>
   );
 }

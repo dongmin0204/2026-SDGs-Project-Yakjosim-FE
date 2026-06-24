@@ -1,17 +1,19 @@
 import type { AnalysisResult, Severity } from '@/types';
 
-export type RiskDisplaySeverity = 'critical' | 'caution' | 'unknown';
+export type RiskDisplaySeverity = 'critical' | 'caution' | 'safe' | 'info' | 'consult' | 'unknown';
 
 export function getRiskDisplaySeverity(severity: Severity): RiskDisplaySeverity {
-  if (severity === 'critical') {
-    return 'critical';
+  switch (severity) {
+    case 'critical':
+      return 'critical';
+    case 'high':
+    case 'medium':
+      return 'caution';
+    case 'low':
+      return 'safe';
+    case 'unknown':
+      return 'unknown';
   }
-
-  if (severity === 'unknown') {
-    return 'unknown';
-  }
-
-  return 'caution';
 }
 
 export function getRiskDisplayLabel(severity: Severity): string {
@@ -22,6 +24,12 @@ export function getRiskDisplayLabel(severity: Severity): string {
       return '금기';
     case 'caution':
       return '주의';
+    case 'safe':
+      return '안전';
+    case 'info':
+      return '참고';
+    case 'consult':
+      return '상담 권장';
     case 'unknown':
       return '확인 정보 없음';
   }
