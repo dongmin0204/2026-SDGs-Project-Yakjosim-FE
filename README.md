@@ -1,36 +1,56 @@
+<div align="center">
+
+<img src="./public/favicon.svg" alt="약 조심 로고" width="80" />
+
 # 약 조심
 
-> **먹으려는 약이 안전한지, 바로 확인하는 복약 안전 가이드**
-> 약, 음식, 영양제 조합의 상호작용 위험도를 쉬운 말로 안내해요.
+**먹으려는 약이 안전한지, 바로 확인하는 복약 안전 가이드**
 
-![React](https://img.shields.io/badge/React_18-61DAFB?logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?logo=tailwindcss&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
-![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)
+약, 음식, 영양제 조합의 상호작용 위험도를 쉬운 말로 안내해요.
+
+[![React](https://img.shields.io/badge/React_18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![PWA](https://img.shields.io/badge/PWA-5A0FC8?logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
+
+</div>
 
 ---
 
-## 목차
+## Preview
 
-- [이 앱은 무엇인가요?](#이-앱은-무엇인가요)
-- [누구를 위한 앱인가요?](#누구를-위한-앱인가요)
-- [주요 기능](#주요-기능)
-- [사용자 흐름](#사용자-흐름)
-- [Tech Stack](#tech-stack)
-- [시스템 구조](#시스템-구조)
-- [프로젝트 구조](#프로젝트-구조)
-- [라우팅](#라우팅)
-- [디자인 시스템](#디자인-시스템)
-- [개발 시작하기](#개발-시작하기)
-- [주요 명령어](#주요-명령어)
+### Desktop
+
+<p align="center">
+  <img src="./public/screenshots/d-01-home.png" alt="홈" width="80%" />
+</p>
+
+<p align="center">
+  <img src="./public/screenshots/d-02-search.png" alt="약 검색" width="49%" />
+  <img src="./public/screenshots/d-03-analyze.png" alt="조합 분석" width="49%" />
+</p>
+
+<p align="center">
+  <img src="./public/screenshots/d-04-settings.png" alt="설정" width="80%" />
+</p>
+
+### Mobile
+
+<p align="center">
+  <img src="./public/screenshots/m-01-onboarding.png" alt="온보딩" width="19%" />
+  <img src="./public/screenshots/m-02-home.png" alt="홈" width="19%" />
+  <img src="./public/screenshots/m-03-search.png" alt="약 검색" width="19%" />
+  <img src="./public/screenshots/m-04-analyze.png" alt="조합 분석" width="19%" />
+  <img src="./public/screenshots/m-05-settings.png" alt="설정" width="19%" />
+</p>
 
 ---
 
 ## 이 앱은 무엇인가요?
 
-약 조심은 복용 중인 약, 함께 먹는 음식, 영양제 사이의 상호작용 위험을 확인하는 웹 앱이에요.
-약학정보원과 식약처 DUR 데이터를 기반으로, 금기/주의/확인 정보 없음 3단계로 결과를 안내해요.
+약 조심은 복용 중인 약, 함께 먹는 음식, 영양제 사이의 **상호작용 위험**을 확인하는 웹 앱이에요.
+약학정보원과 식약처 DUR 데이터를 기반으로, **금기 / 주의 / 확인 정보 없음** 3단계로 결과를 안내해요.
 
 비회원으로 바로 이용할 수 있고, 결과를 이미지나 PDF로 저장하거나 공유할 수 있어요.
 
@@ -47,7 +67,7 @@
 
 | 기능 | 설명 |
 | ---- | ---- |
-| 약 검색 | 약품명, 제조사, 성분명으로 약을 찾아요 |
+| 약 검색 | 약품명, 제조사, 성분명으로 약을 찾아요 (Mock 데이터 기반) |
 | 처방전 촬영 | 처방전 사진으로 약을 인식하고 추가해요 (OCR) |
 | 조합 분석 | 약 + 음식 + 영양제 조합의 상호작용을 분석해요 |
 | 위험도 안내 | 금기/주의/확인 정보 없음 3단계로 결과를 보여줘요 |
@@ -98,8 +118,6 @@ flowchart LR
   SW -.-> Cache[(Cache Storage)]
 ```
 
-현재 모든 데이터는 Mock 기반이에요. 백엔드 API 연동 시 `src/services/` 레이어만 교체하면 돼요.
-
 ## 프로젝트 구조
 
 ```text
@@ -148,13 +166,12 @@ public/
 *                        404
 ```
 
-모든 보호 라우트는 온보딩 완료 후 접근할 수 있어요. 라우트 상수는 `src/routes.ts`에서 중앙 관리해요.
 
 ## 디자인 시스템
 
 | 요소 | 접근 방식 |
 | ---- | --------- |
-| 색상 | OKLCH 색공간 기반, 3계층 토큰 (Base → Semantic → Component) |
+| 색상 | OKLCH 색공간 기반, 3계층 토큰 (Base , Semantic , Component) |
 | 서피스 | 테두리 대신 다층 그림자로 깊이 표현 (`surface-card`, `surface-elevated`) |
 | 헤더 | Frosted glass 효과 (`glass` 클래스) |
 | 타이포 | AritaDotumKR 전용, 7단계 스케일 |
@@ -181,6 +198,8 @@ Node.js 20 이상, pnpm 9 이상이 필요해요.
 | `pnpm build` | 프로덕션 빌드 |
 | `pnpm lint` | ESLint 검사 |
 | `pnpm lint:fix` | ESLint 자동 수정 |
+
+---
 
 ## 참고
 
